@@ -187,7 +187,7 @@ export default function CropsScreen() {
     };
 
     setCropsData(prev => [newCropData, ...prev]);
-    
+
     setNewCrop({
       name: "",
       type: "Vegetable",
@@ -197,9 +197,9 @@ export default function CropsScreen() {
       growthStage: "Seedling",
       notes: ""
     });
-    
+
     setShowAddCropModal(false);
-    
+
     Alert.alert(
       "Crop Added Successfully!",
       `${newCropData.name} has been added to your farm.`,
@@ -207,7 +207,7 @@ export default function CropsScreen() {
     );
   };
 
-  const filteredCrops = cropsData.filter(crop => 
+  const filteredCrops = cropsData.filter(crop =>
     crop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     crop.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -220,7 +220,7 @@ export default function CropsScreen() {
         <Animated.View style={[styles.floatingOrb, styles.orb2]} />
       </View>
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
@@ -232,7 +232,7 @@ export default function CropsScreen() {
         >
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.backButton}
               onPress={() => router.back()}
             >
@@ -286,8 +286,8 @@ export default function CropsScreen() {
           </View>
 
           {/* Crop Type Filters */}
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.cropTypesScroll}
             contentContainerStyle={styles.cropTypesContent}
@@ -311,8 +311,8 @@ export default function CropsScreen() {
             </Text>
 
             {filteredCrops.map((crop: any) => (
-              <TouchableOpacity 
-                key={crop.id} 
+              <TouchableOpacity
+                key={crop.id}
                 style={styles.cropCard}
                 onPress={() => setSelectedCrop(crop)}
               >
@@ -349,14 +349,14 @@ export default function CropsScreen() {
                     <Text style={styles.progressPercentage}>{crop.progress}%</Text>
                   </View>
                   <View style={styles.progressBar}>
-                    <View 
+                    <View
                       style={[
                         styles.progressFill,
-                        { 
+                        {
                           width: `${crop.progress}%`,
                           backgroundColor: getStatusColor(crop.health)
                         }
-                      ]} 
+                      ]}
                     />
                   </View>
                   <Text style={styles.growthStage}>{crop.growthStage} Stage</Text>
@@ -379,10 +379,10 @@ export default function CropsScreen() {
                   styles.actionBox,
                   crop.health === 'alert' && styles.actionBoxAlert
                 ]}>
-                  <MaterialCommunityIcons 
-                    name={crop.actionIcon} 
-                    size={20} 
-                    color={crop.actionColor} 
+                  <MaterialCommunityIcons
+                    name={crop.actionIcon}
+                    size={20}
+                    color={crop.actionColor}
                   />
                   <Text style={styles.actionText}>{crop.nextAction}</Text>
                   <TouchableOpacity style={styles.actionButton}>
@@ -407,7 +407,7 @@ export default function CropsScreen() {
               <Text style={styles.emptyStateText}>
                 {searchQuery ? 'Try a different search term' : 'Start by adding your first crop'}
               </Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.emptyStateButton}
                 onPress={() => setShowAddCropModal(true)}
               >
@@ -420,7 +420,7 @@ export default function CropsScreen() {
       </ScrollView>
 
       {/* Floating Action Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.fab}
         onPress={() => setShowAddCropModal(true)}
       >
@@ -441,44 +441,18 @@ export default function CropsScreen() {
                 <Ionicons name="close" size={24} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               <Text style={styles.modalDescription}>
                 Track your crops and get personalized farming advice
               </Text>
 
               {/* Crop Selection */}
-              <View style={styles.formSection}>
-                <Text style={styles.formLabel}>Select Crop Type</Text>
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={false}
-                  style={styles.cropOptionsScroll}
-                >
-                  {cropOptions.map((crop, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={[
-                        styles.cropOption,
-                        newCrop.name === crop.name && styles.cropOptionSelected
-                      ]}
-                      onPress={() => handleSelectCrop(crop)}
-                    >
-                      <Image source={{ uri: crop.image }} style={styles.cropOptionImage} />
-                      <Text style={[
-                        styles.cropOptionText,
-                        newCrop.name === crop.name && styles.cropOptionTextSelected
-                      ]}>
-                        {crop.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
+
 
               {/* Custom Crop Input */}
               <View style={styles.formSection}>
-                <Text style={styles.formLabel}>Or Enter Custom Crop</Text>
+                <Text style={styles.formLabel}>Enter Crop Name</Text>
                 <View style={styles.inputContainer}>
                   <Ionicons name="leaf-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                   <TextInput
@@ -493,25 +467,24 @@ export default function CropsScreen() {
 
               {/* Crop Type */}
               <View style={styles.formSection}>
-                <Text style={styles.formLabel}>Crop Category</Text>
-                <View style={styles.typeSelector}>
-                  {["Vegetable", "Cereal", "Legume", "Fruit", "Other"].map((type) => (
-                    <TouchableOpacity
-                      key={type}
-                      style={[
-                        styles.typeOption,
-                        newCrop.type === type && styles.typeOptionSelected
-                      ]}
-                      onPress={() => handleInputChange('type', type)}
-                    >
-                      <Text style={[
-                        styles.typeOptionText,
-                        newCrop.type === type && styles.typeOptionTextSelected
-                      ]}>
-                        {type}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                <Text style={styles.formLabel}>Enter Crop Variety</Text>
+                <View style={styles.inputContainer}>
+                  <MaterialCommunityIcons
+                    name="crop"
+                    size={20}
+                    color={colors.primary}
+                    style={styles.inputIcon}
+                  />
+
+
+
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter crop variety"
+                    placeholderTextColor={colors.textSecondary}
+                    value={newCrop.name}
+                    onChangeText={(value) => handleInputChange('name', value)}
+                  />
                 </View>
               </View>
 
@@ -532,12 +505,12 @@ export default function CropsScreen() {
 
               {/* Area */}
               <View style={styles.formSection}>
-                <Text style={styles.formLabel}>Area (Hectares)</Text>
+                <Text style={styles.formLabel}>Location</Text>
                 <View style={styles.inputContainer}>
                   <MaterialCommunityIcons name="map-marker" size={20} color={colors.primary} style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter area in hectares"
+                    placeholder="Enter Location"
                     placeholderTextColor={colors.textSecondary}
                     value={newCrop.area}
                     onChangeText={(value) => handleInputChange('area', value)}
@@ -546,49 +519,26 @@ export default function CropsScreen() {
                 </View>
               </View>
 
-              {/* Growth Stage */}
-              <View style={styles.formSection}>
-                <Text style={styles.formLabel}>Current Growth Stage</Text>
-                <View style={styles.stageSelector}>
-                  {growthStages.map((stage) => (
-                    <TouchableOpacity
-                      key={stage.value}
-                      style={[
-                        styles.stageOption,
-                        newCrop.growthStage === stage.value && styles.stageOptionSelected
-                      ]}
-                      onPress={() => handleInputChange('growthStage', stage.value)}
-                    >
-                      <Text style={[
-                        styles.stageOptionText,
-                        newCrop.growthStage === stage.value && styles.stageOptionTextSelected
-                      ]}>
-                        {stage.label}
-                      </Text>
-                      <Text style={styles.stageProgress}>{stage.progress}%</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
+
+
 
               {/* Expected Yield */}
-              <View style={styles.formSection}>
-                <Text style={styles.formLabel}>Expected Yield (tons) - Optional</Text>
+               <View style={styles.formSection}>
+                <Text style={styles.formLabel}>Expected Harvesting Date</Text>
                 <View style={styles.inputContainer}>
-                  <MaterialCommunityIcons name="basket" size={20} color={colors.primary} style={styles.inputIcon} />
+                  <Ionicons name="calendar-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter expected yield"
+                    placeholder="YYYY-MM-DD"
                     placeholderTextColor={colors.textSecondary}
-                    value={newCrop.expectedYield}
-                    onChangeText={(value) => handleInputChange('expectedYield', value)}
-                    keyboardType="numeric"
+                    value={newCrop.plantedDate}
+                    onChangeText={(value) => handleInputChange('plantedDate', value)}
                   />
                 </View>
               </View>
 
               {/* Notes */}
-              <View style={styles.formSection}>
+              {/* <View style={styles.formSection}>
                 <Text style={styles.formLabel}>Notes - Optional</Text>
                 <View style={styles.textAreaContainer}>
                   <TextInput
@@ -602,17 +552,17 @@ export default function CropsScreen() {
                     textAlignVertical="top"
                   />
                 </View>
-              </View>
+              </View> */}
             </ScrollView>
 
             <View style={styles.modalFooter}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalCancel}
                 onPress={() => setShowAddCropModal(false)}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalConfirm}
                 onPress={handleAddCrop}
               >

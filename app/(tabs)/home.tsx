@@ -1,23 +1,25 @@
-import { FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
+  Dimensions,
   Image,
+  Modal,
+  Platform, // Imported
+  Pressable,
+  ActivityIndicator,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Dimensions,
-  Platform,
-  Modal, // Imported
-  Pressable, // Imported
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "../../contexts/ThemeContext";
 import { getThemeColors, ThemeColors } from "../../constants/theme";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -29,6 +31,12 @@ interface Crop {
   actionType: 'water' | 'fertilize' | 'harvest' | 'spray';
   daysLeft: number;
   health: number;
+}
+
+interface UserData {
+  user?: any;
+  loginTime?: string;
+  token?: string;
 }
 
 export default function HomeScreen() {
@@ -44,6 +52,10 @@ export default function HomeScreen() {
   const colors = getThemeColors(currentTheme);
   const { bottom: bottomInset } = useSafeAreaInsets();
   const styles = createStyles(colors, bottomInset);
+
+  // User data state
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // ... (Weather and Crop Data remains the same) ...
   const [weatherData, setWeatherData] = useState({
@@ -65,6 +77,25 @@ export default function HomeScreen() {
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const retrieveUserData = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem("userLoggedIn");
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          setUserData(parsedData);
+          console.log("User data retrieved:", parsedData);
+        }
+      } catch (error) {
+        console.error("Failed to retrieve user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    retrieveUserData();
   }, []);
 
   const onRefresh = () => {
@@ -137,9 +168,17 @@ export default function HomeScreen() {
     if (modalToClose === 'addCrop') setIsAddCropModalVisible(false);
     
     setTimeout(() => {
-      router.push(path);
+      router.push(path as any);
     }, 150);
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#00FF88" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
@@ -157,9 +196,17 @@ export default function HomeScreen() {
         </TouchableOpacity>
         
         <View style={styles.headerTextContainer}>
-          <Text style={styles.greetingText}>{getGreeting()}</Text>
-          <Text style={styles.userName}>Jean Baptiste</Text>
-        </View>
+  <Text style={styles.greetingText}>{getGreeting()}</Text>
+  <Text style={styles.userName}>
+    {userData?.user?.firstName && userData?.user?.lastName
+      ? `${userData.user.firstName} ${userData.user.lastName}`
+      : userData?.user?.name
+      ? userData.user.name
+      : userData?.user?.email
+      ? userData.user.email.split('@')[0]
+      : 'Farmer'}
+  </Text>
+</View>
 
         <TouchableOpacity 
           style={styles.notificationButton}
@@ -314,30 +361,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.quickActionsGrid}>
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => router.push('/scan')}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.quickActionIcon, { backgroundColor: `${colors.primary}15` }]}>
-                <Ionicons name="camera" size={28} color={colors.primary} />
-              </View>
-              <Text style={styles.quickActionTitle}>Scan Plant</Text>
-              <Text style={styles.quickActionSubtitle}>ID diseases</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => router.push('/pests')}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.quickActionIcon, { backgroundColor: `${colors.error}15` }]}>
-                <FontAwesome5 name="bug" size={24} color={colors.error} />
-              </View>
-              <Text style={styles.quickActionTitle}>Pest Control</Text>
-              <Text style={styles.quickActionSubtitle}>Manage pests</Text>
-            </TouchableOpacity>
-
+          
             <TouchableOpacity 
               style={styles.quickActionCard}
               onPress={() => router.push('/calendar')}
@@ -757,6 +781,7 @@ const createStyles = (colors: ThemeColors, bottomInset: number) => StyleSheet.cr
     color: colors.text,
     fontSize: 20,
     fontWeight: 'bold',
+    paddingBottom: 4,
   },
   sectionActions: {
     flexDirection: 'row',

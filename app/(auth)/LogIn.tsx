@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -12,7 +13,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { useAuth } from "../../contexts/AuthContext"; // added import
+import { useAuth } from "../../contexts/AuthContext";
 
 interface LogInFormData {
   emailOrPhone: string;
@@ -21,7 +22,7 @@ interface LogInFormData {
 
 export default function LogIn() {
   const router = useRouter();
-  const { signIn } = useAuth(); // optional, if your AuthContext exposes a signIn/login method
+  const { signIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const { control, handleSubmit, formState: { errors } } = useForm<LogInFormData>({
     defaultValues: {
@@ -47,17 +48,25 @@ export default function LogIn() {
       const responseData = await response.json();
 
       if (response.ok) {
-        // store auth state if AuthContext provides signIn (await so context updates before navigation)
+        // Store user data temporarily in AsyncStorage
+        try {
+          await AsyncStorage.setItem("userLoggedIn", JSON.stringify({
+            user: responseData.user || responseData,
+            loginTime: new Date().toISOString(),
+            token: responseData.token,
+          }));
+        } catch (storageError) {
+          console.warn("Failed to store user data:", storageError);
+        }
+
         if (typeof signIn === "function") {
           try {
             signIn(responseData);
           } catch (e) {
             console.warn("AuthContext.signIn failed:", e);
-            // still attempt navigation if signIn fails to avoid blocking the user
           }
         }
 
-        // navigate to tabs home and prevent back to auth
         router.replace("/(tabs)/home");
       } else {
         Alert.alert("Error", responseData.message || "Login failed");
